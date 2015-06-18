@@ -22,8 +22,8 @@ if args.file and len(args.command) > 1:
 if len(args.command) < 2 and not args.file:
     exit("Usage: gpi [command] [package]")
 
-gimp_plugins_dir = "/home/tschuy/.gimp-2.8/plug-ins/"
-host = "http://localhost/"
+gimp_plugins_dir = os.environ.get('GIMP_PLUGIN_DIR', os.path.expanduser("~/.gimp-2.8/plug-ins/"))    
+host = os.environ.get('GPI_HOST', "http://localhost:8000/")
 
 def plugin_config_file(plugin_name):
     return gimp_plugins_dir + '.' + plugin_name
