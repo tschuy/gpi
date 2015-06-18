@@ -6,7 +6,7 @@ import urllib2
 import io
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(usage="gpi [command] [package]\n       gpi install -f [file]")
 
 parser.add_argument('command',nargs='+')
 parser.add_argument("-f", "--file", help="install from file", default=False,
@@ -18,6 +18,9 @@ if args.file and args.command[0] != "install":
 
 if args.file and len(args.command) > 1:
     exit("Specify either a file or a package name!")
+
+if len(args.command) < 2 and not args.file:
+    exit("Usage: gpi [command] [package]")
 
 gimp_plugins_dir = "/home/tschuy/.gimp-2.8/plug-ins/"
 host = "http://localhost/"
