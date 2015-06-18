@@ -1,6 +1,6 @@
 # GIMP Plugin Installer
 
-[!Build Status](https://travis-ci.org/tschuy/gpi.svg)
+![Build Status](https://travis-ci.org/tschuy/gpi.svg)
 
 Install GIMP plugins from the command line with a simple, easy to use package
 manager.
