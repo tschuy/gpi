@@ -3,8 +3,11 @@ import tarfile
 import sys
 import os
 import json
+import urllib2
+import io
 
 gimp_plugins_dir = "/home/tschuy/.gimp-2.8/plug-ins/"
+host = "http://localhost/"
 
 def plugin_config_file(plugin_name):
     return gimp_plugins_dir + '.' + plugin_name
@@ -13,10 +16,13 @@ def plugin_config_file(plugin_name):
 if sys.argv[1] == "install":
     if sys.argv[2] == "-f":
         filename = sys.argv[3]
-
-    if not tarfile.is_tarfile(filename):
-        exit("File must be a tarfile!")
-    t = tarfile.open(filename, 'r')
+        if not tarfile.is_tarfile(filename):
+            exit("File must be a tarfile!")
+        t = tarfile.open(filename, 'r')
+    else:
+        response = urllib2.urlopen(host + sys.argv[2] + '.tar.gz')
+        t=tarfile.open(fileobj=io.BytesIO(response.read()), mode='r')
+        filename = host + sys.argv[2] + '.tar.gz'
 
     manifest = json.load(t.extractfile('gpi.json'))
     print("Installing " + manifest['name'] + " from " + filename)
