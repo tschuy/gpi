@@ -12,37 +12,23 @@ host = "http://localhost/"
 def plugin_config_file(plugin_name):
     return gimp_plugins_dir + '.' + plugin_name
 
-
-if sys.argv[1] == "install":
-    if sys.argv[2] == "-f":
-        filename = sys.argv[3]
-        if not tarfile.is_tarfile(filename):
-            exit("File must be a tarfile!")
-        t = tarfile.open(filename, 'r')
-    else:
-        response = urllib2.urlopen(host + sys.argv[2] + '.tar.gz')
-        t=tarfile.open(fileobj=io.BytesIO(response.read()), mode='r')
-        filename = host + sys.argv[2] + '.tar.gz'
-
-    manifest = json.load(t.extractfile('gpi.json'))
+def install(tar, manifest, filename):
     print("Installing " + manifest['name'] + " from " + filename)
 
     with open(plugin_config_file(manifest['identifier']), 'w') as f:
+        files = [t for t in tar if t.name != 'gpi.json']
         plugin_info = {
             'version': manifest['version'],
             'name': manifest['name'],
-            'files': t.getnames()
+            'files': [file.name for file in files]
         }
         f.write(json.dumps(plugin_info))
 
-    t.extractall(gimp_plugins_dir)
+    tar.extractall(gimp_plugins_dir, members=files)
     print(manifest['name'] + " " + manifest['version'] + " installed successfully!")
 
-elif sys.argv[1] == "uninstall":
-    config = plugin_config_file(sys.argv[2])
-    if not os.path.isfile(config):
-        exit(plugin_name + " is not installed!")
 
+def uninstall(config):
     with open(config, 'r') as f:
         data = json.load(f)
 
@@ -57,3 +43,24 @@ elif sys.argv[1] == "uninstall":
         os.remove(config)
 
     print(data['name'] + " " + data['version'] + " uninstalled successfully!")
+
+
+if sys.argv[1] == "install":
+    if sys.argv[2] == "-f":
+        filename = sys.argv[3]
+        if not tarfile.is_tarfile(filename):
+            exit("File must be a tarfile!")
+        t = tarfile.open(filename, 'r')
+    else:
+        response = urllib2.urlopen(host + sys.argv[2] + '.tar.gz')
+        t=tarfile.open(fileobj=io.BytesIO(response.read()), mode='r')
+        filename = host + sys.argv[2] + '.tar.gz'
+
+    manifest = json.load(t.extractfile('gpi.json'))
+    install(t, manifest, filename)
+
+elif sys.argv[1] == "uninstall":
+    config = plugin_config_file(sys.argv[2])
+    if not os.path.isfile(config):
+        exit(plugin_name + " is not installed!")
+    uninstall(config)
