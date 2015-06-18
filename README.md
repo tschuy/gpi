@@ -23,6 +23,8 @@ ToDo:
 6. Install from git
 7. Documentation
 8. Code cleanup
+9. TESTS
+10. Allow usage of pip-installed packages?
 
 How to package your plugin
 --------------------------
