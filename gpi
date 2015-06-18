@@ -4,25 +4,24 @@ import sys
 import os
 import json
 
-plugin_name = sys.argv[2]
-
 gimp_plugins_dir = "/home/tschuy/.gimp-2.8/plug-ins/"
 
-plugin_config_file = gimp_plugins_dir + '.' + plugin_name
+def plugin_config_file(plugin_name):
+    return gimp_plugins_dir + '.' + plugin_name
 
 
 if sys.argv[1] == "install":
-
-    if plugin_name == "imguruploader":
-        filename = "/home/tschuy/imgur-uploader.tar.gz"
+    if sys.argv[2] == "-f":
+        filename = sys.argv[3]
 
     if not tarfile.is_tarfile(filename):
         exit("File must be a tarfile!")
     t = tarfile.open(filename, 'r')
 
     manifest = json.load(t.extractfile('gpi.json'))
+    print("Installing " + manifest['name'] + " from " + filename)
 
-    with open(plugin_config_file, 'w') as f:
+    with open(plugin_config_file(manifest['identifier']), 'w') as f:
         plugin_info = {
             'version': manifest['version'],
             'name': manifest['name'],
@@ -34,10 +33,11 @@ if sys.argv[1] == "install":
     print(manifest['name'] + " " + manifest['version'] + " installed successfully!")
 
 elif sys.argv[1] == "uninstall":
-    if not os.path.isfile(plugin_config_file):
+    config = plugin_config_file(sys.argv[2])
+    if not os.path.isfile(config):
         exit(plugin_name + " is not installed!")
 
-    with open(plugin_config_file, 'r') as f:
+    with open(config, 'r') as f:
         data = json.load(f)
 
         directories = []
@@ -48,6 +48,6 @@ elif sys.argv[1] == "uninstall":
                 os.remove(gimp_plugins_dir + file)
 
         # TODO remove empty directories
-        os.remove(plugin_config_file)
+        os.remove(config)
 
     print(data['name'] + " " + data['version'] + " uninstalled successfully!")
