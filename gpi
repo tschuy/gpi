@@ -7,7 +7,7 @@ import urllib2
 import io
 import argparse
 from installer import install, uninstall, plugin_config_file
-from web import get_from_web
+from web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
     usage="gpi [command] [package]\n       gpi install -f [file]")
@@ -33,13 +33,17 @@ def main():
             if not tarfile.is_tarfile(args.file):
                 exit("File must be a tarfile!")
             t = tarfile.open(args.file, 'r')
-            filename = args.file
+            print("Installing {}".format(args.file))
         else:
-            t = get_from_web(args.command[1], host)
-            exit()
+            try:
+                t = get_from_web(args.command[1])
+            except PackageNotFound:
+                exit("{} was not found".format(args.command[1]))
+            except PackageReadError as e:
+                exit("{} could not be read.".format(str(e)))
 
         manifest = json.load(t.extractfile('gpi.json'))
-        print("Installing " + manifest['name'] + " from " + filename)
+        print("Installing version " + manifest['version'])
         install(t, manifest)
         print("{} {} installed successfully!".format(
             manifest['name'], manifest['version']))
