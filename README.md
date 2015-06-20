@@ -8,18 +8,29 @@ manager.
 Usage
 -----
 
-``gpi install imguruploader``
-``gpi uninstall imguruploader``
-``gpi install -f ~/imgur-uploader.tar.gz``
+Install from gpi-web:
+
+```
+$ gpi install imguruploader
+```
+
+Uninstall an installed package:
+```
+$ gpi uninstall imguruploader
+```
+
+Install from a locally downloaded file:
+```
+$ gpi install -f ~/imgur-uploader.tar.gz
+```
 
 
 ToDo:
 
-1. Django app to fetch plugins from
+1. Allow GIMP to import plugins recursively
 2. Remove empty folders!
 3. Standardize ``gpi.json``
 4. Catch duplicate files
-5. Install from file
 6. Install from git
 7. Documentation
 8. Code cleanup
