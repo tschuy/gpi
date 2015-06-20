@@ -6,11 +6,14 @@ import json
 import urllib2
 import io
 import argparse
-from installer import install, uninstall, plugin_config_file
+from installer import install, uninstall
 from web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
-    usage="gpi [command] [package]\n       gpi install -f [file]")
+    usage="\n"\
+"       gpi install [package]\n" \
+"       gpi install -f [file]\n" \
+"       gpi uninstall [package]")
 
 parser.add_argument('command', nargs='+')
 parser.add_argument("-f", "--file", help="install from file", default=False,
@@ -49,11 +52,11 @@ def main():
             manifest['name'], manifest['version']))
 
     elif args.command[0] == "uninstall":
-        config = plugin_config_file(args.command[1])
-        if not os.path.isfile(config):
-            exit(args.command[1] + " is not installed!")
-        uninstall(config)
-        print("{} uninstalled successfully!".format(args.command[1]))
+        uninstall_successful = uninstall(args.command[1])
+        if uninstall_successful:
+            print("{} uninstalled successfully!".format(args.command[1]))
+        else:
+            print("Could not uninstall {}!".format(argv.command[1]))
 
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
