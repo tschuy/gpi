@@ -3,17 +3,15 @@ import tarfile
 import os
 import sys
 import json
-import urllib2
-import io
 import argparse
 from installer import install, uninstall
 from web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
-    usage="\n"\
-"       gpi install [package]\n" \
-"       gpi install -f [file]\n" \
-"       gpi uninstall [package]")
+    usage="\n"
+    "       gpi install [package]\n"
+    "       gpi install -f [file]\n"
+    "       gpi uninstall [package]")
 
 parser.add_argument('command', nargs='+')
 parser.add_argument("-f", "--file", help="install from file", default=False,
@@ -56,8 +54,9 @@ def main():
         if uninstall_successful:
             print("{} uninstalled successfully!".format(args.command[1]))
         else:
-            print("Could not uninstall {}!".format(argv.command[1]))
+            print("Could not uninstall {}!".format(args.command[1]))
 
 if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     main()

@@ -8,7 +8,8 @@ gpi_config_file = gimp_plugins_dir + '.gpi.json'
 
 
 def is_non_zero_file(path):
-    return True if os.path.isfile(path) and os.path.getsize(path) > 0 else False
+    return True if os.path.isfile(
+        path) and os.path.getsize(path) > 0 else False
 
 
 def install(tar, manifest):
