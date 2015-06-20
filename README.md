@@ -24,19 +24,6 @@ Install from a locally downloaded file:
 $ gpi install -f ~/imgur-uploader.tar.gz
 ```
 
-
-ToDo:
-
-1. Allow GIMP to import plugins recursively
-2. Remove empty folders!
-3. Standardize ``gpi.json``
-4. Catch duplicate files
-6. Install from git
-7. Documentation
-8. Code cleanup
-9. TESTS
-10. Allow usage of pip-installed packages?
-
 How to package your plugin
 --------------------------
 
@@ -50,9 +37,29 @@ Then, add a ``gpi.json`` file to your tarfile. It should look like this:
 ```
 {
     "version": "0.1.0",
-    "name": "ImgurUploader",
-    "identifier": "imguruploader"
+    "name": "Imgur Uploader",
+    "identifier": "imguruploader",
+    "author": "tschuy",
+    "license": "MIT",
+    "url": "https://github.com/tschuy/gimp-export-to-imgur",
+    "description": "Upload your images to Imgur directly from the Save menu"
 }
 ```
 
 Now, you can pass this file to ``gpi`` and it will install your plugin.
+
+Testing
+-------
+
+Currently, ``gpi`` has no tests. This is a major issue and will be rectified as
+soon as possible.
+
+Issues
+------
+
+1. Remove empty folders on uninstall
+2. Catch duplicate files and disallow uninstallation (or fix GIMP to allow recursive plugin finding)
+3. Install plugins from git
+4. Documentation
+5. Code cleanup
+6. Allow the use of a virtualenv to install packages from pip
