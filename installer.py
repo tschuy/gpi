@@ -1,9 +1,9 @@
 import os
-import tarfile
 import json
 
 gimp_plugins_dir = os.environ.get(
     'GIMP_PLUGIN_DIR', os.path.expanduser("~/.gimp-2.8/plug-ins/"))
+
 
 def plugin_config_file(plugin_name):
     return gimp_plugins_dir + '.' + plugin_name

@@ -6,6 +6,7 @@ import tarfile
 
 host = os.environ.get('GPI_HOST', "http://localhost:8000")
 
+
 class PackageNotFound(Exception):
     """
     The exception thrown if the package 404s
@@ -24,7 +25,7 @@ def get_from_web(package_name):
     url = "{}/api/package/{}".format(host, package_name)
     try:
         response = urllib2.urlopen(url)
-    except urllib2.HTTPError as error:
+    except urllib2.HTTPError:
         raise PackageNotFound
 
     package_info = json.loads(response.read())
