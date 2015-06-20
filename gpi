@@ -1,10 +1,13 @@
 #!/usr/bin/python
 import tarfile
 import os
+import sys
 import json
 import urllib2
 import io
 import argparse
+from installer import install, uninstall, plugin_config_file
+from web import get_from_web
 
 parser = argparse.ArgumentParser(
     usage="gpi [command] [package]\n       gpi install -f [file]")
@@ -23,65 +26,31 @@ if args.file and len(args.command) > 1:
 if len(args.command) < 2 and not args.file:
     exit("Usage: gpi [command] [package]")
 
-gimp_plugins_dir = os.environ.get(
-    'GIMP_PLUGIN_DIR', os.path.expanduser("~/.gimp-2.8/plug-ins/"))
-host = os.environ.get('GPI_HOST', "http://localhost:8000/")
 
+def main():
+    if args.command[0] == "install":
+        if args.file:
+            if not tarfile.is_tarfile(args.file):
+                exit("File must be a tarfile!")
+            t = tarfile.open(args.file, 'r')
+            filename = args.file
+        else:
+            t = get_from_web(args.command[1], host)
+            exit()
 
-def plugin_config_file(plugin_name):
-    return gimp_plugins_dir + '.' + plugin_name
+        manifest = json.load(t.extractfile('gpi.json'))
+        print("Installing " + manifest['name'] + " from " + filename)
+        install(t, manifest)
+        print("{} {} installed successfully!".format(
+            manifest['name'], manifest['version']))
 
+    elif args.command[0] == "uninstall":
+        config = plugin_config_file(args.command[1])
+        if not os.path.isfile(config):
+            exit(args.command[1] + " is not installed!")
+        uninstall(config)
+        print("{} uninstalled successfully!".format(args.command[1]))
 
-def install(tar, manifest, filename):
-    print("Installing " + manifest['name'] + " from " + filename)
-
-    with open(plugin_config_file(manifest['identifier']), 'w') as f:
-        files = [t for t in tar if t.name != 'gpi.json']
-        plugin_info = {
-            'version': manifest['version'],
-            'name': manifest['name'],
-            'files': [file.name for file in files]
-        }
-        f.write(json.dumps(plugin_info))
-
-    tar.extractall(gimp_plugins_dir, members=files)
-    print("{} {} installed successfully!".format(
-        manifest['name'], manifest['version']))
-
-
-def uninstall(config):
-    with open(config, 'r') as f:
-        data = json.load(f)
-
-        directories = []
-        for file in data['files']:
-            if os.path.isdir(gimp_plugins_dir + file):
-                directories.append(gimp_plugins_dir + file)
-            else:
-                os.remove(gimp_plugins_dir + file)
-
-        # TODO remove empty directories
-        os.remove(config)
-
-    print(data['name'] + " " + data['version'] + " uninstalled successfully!")
-
-
-if args.command[0] == "install":
-    if args.file:
-        if not tarfile.is_tarfile(args.file):
-            exit("File must be a tarfile!")
-        t = tarfile.open(args.file, 'r')
-        filename = args.file
-    else:
-        response = urllib2.urlopen(host + args.command[1] + '.tar.gz')
-        t = tarfile.open(fileobj=io.BytesIO(response.read()), mode='r')
-        filename = host + args.command[1] + '.tar.gz'
-
-    manifest = json.load(t.extractfile('gpi.json'))
-    install(t, manifest, filename)
-
-elif args.command[0] == "uninstall":
-    config = plugin_config_file(args.command[1])
-    if not os.path.isfile(config):
-        exit(args.command[1] + " is not installed!")
-    uninstall(config)
+if __name__ == "__main__":
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    main()
