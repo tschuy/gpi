@@ -14,14 +14,14 @@ class PackageNotFound(Exception):
 
 
 class PackageReadError(Exception):
-    def __init__(self, url):
-        super(PackageReadError, self).__init__(url)
     """
     The exception thrown if the package cannot be read
     """
+    def __init__(self, url):
+        super(PackageReadError, self).__init__(url)
 
-
-def get_from_web(package_name):
+def get_package_info(package_name):
+    """Retrieve the package metadata as json from the GPI host"""
     url = "{}/api/package/{}".format(host, package_name)
     try:
         response = urllib2.urlopen(url)
@@ -29,6 +29,11 @@ def get_from_web(package_name):
         raise PackageNotFound
 
     package_info = json.loads(response.read())
+    return package_info
+
+
+def get_from_web(package_name):
+    package_info = get_package_info(package_name)
     url = "{}{}".format(
         host, package_info['releases'][0]['file'])
     file = urllib2.urlopen(url).read()
