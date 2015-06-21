@@ -20,6 +20,7 @@ class PackageReadError(Exception):
     def __init__(self, url):
         super(PackageReadError, self).__init__(url)
 
+
 def get_package_info(package_name):
     """Retrieve the package metadata as json from the GPI host"""
     url = "{}/api/package/{}".format(host, package_name)

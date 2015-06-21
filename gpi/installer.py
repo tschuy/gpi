@@ -76,6 +76,7 @@ def uninstall(plugin_name):
 
     return True
 
+
 def info(plugin_name):
     """Lists all installed packages registered with gpi.
     Always lists the package name and whether it is installed.
@@ -116,6 +117,7 @@ def info(plugin_name):
     if 'description' in plugin_info:
         print('Description: {}'.format(plugin_info['description']))
     print('Installed: {}'.format(installed))
+
 
 def list_installed():
     """Lists all installed packages registered with gpi"""
