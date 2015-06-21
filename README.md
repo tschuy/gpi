@@ -24,15 +24,17 @@ Install from a locally downloaded file:
 $ gpi install -f ~/imgur-uploader.tar.gz
 ```
 
-How to package your plugin
---------------------------
+Anatomy of a gpi package (aka how to package your plugin)
+---------------------------------------------------------
 
-To package your plugin, place any required files into a tar.gz file. This
-tarfile will be extracted directly into your user's plugins folder, and so be
-sure to only include necessary files. If you want extra files, consider making
-a directory named after your plugin and putting them in there.
+The root level of a gpi package requires two things: a ``gpi.json`` manifest
+file, and a ``contents/`` directory. The ``contents/`` directory will be
+extracted directly to the user's GIMP plugin directory, so make sure you only
+include files necessary for your plugin. You can put other content, like a
+LICENSE or CHANGELOG, in the root of the package. Files outside of ``contents/``
+will be ignored.
 
-Then, add a ``gpi.json`` file to your tarfile. It should look like this:
+Your ``gpi.json`` file should look like this:
 
 ```
 {
@@ -45,11 +47,11 @@ Then, add a ``gpi.json`` file to your tarfile. It should look like this:
     "description": "Upload your images to Imgur directly from the Save menu"
 }
 ```
+To test your plugin, pass your ``.tar.gz`` to gpi with the ``-f`` flag. Open
+GIMP, and verify your plugin works as expected.
 
-Now, you can pass this file to ``gpi`` and it will install your plugin.
-
-Testing
--------
+Testing gpi
+-----------
 
 Currently, ``gpi`` has no tests. This is a major issue and will be rectified as
 soon as possible.
@@ -63,3 +65,4 @@ Issues
 4. Documentation
 5. Code cleanup
 6. Allow the use of a virtualenv to install packages from pip
+7. Add verbose mode

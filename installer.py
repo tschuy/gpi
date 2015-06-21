@@ -6,6 +6,8 @@ gimp_plugins_dir = os.environ.get(
 
 gpi_config_file = gimp_plugins_dir + '.gpi.json'
 
+verbose = False
+
 
 def is_non_zero_file(path):
     return True if os.path.isfile(
@@ -19,7 +21,14 @@ def install(tar, manifest):
         with open(gpi_config_file, 'r') as f:
             index = json.load(f)
 
-    files = [t for t in tar if t.name != 'gpi.json']
+    files = [t for t in tar if t.name.startswith("contents/")]
+
+    for t in files:
+        t.name = t.name[9:] # contents/
+        if verbose:
+            print "Installing {} to {}/{}".format(
+                t.name, gimp_plugins_dir, t.name)
+
     plugin_info = {
         'version': manifest['version'],
         'name': manifest['name'],
@@ -37,7 +46,6 @@ def uninstall(plugin_name):
     with open(gpi_config_file, 'r') as f:
         index = json.load(f)
         if plugin_name not in index:
-            f.write(json.dumps(index))
             return False
 
     directories = []
@@ -49,7 +57,6 @@ def uninstall(plugin_name):
             os.remove(gimp_plugins_dir + file)
 
     del index[plugin_name]
-    print index
     with open(gpi_config_file, 'w') as f:
         f.write(json.dumps(index))
 
