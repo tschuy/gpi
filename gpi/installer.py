@@ -15,7 +15,7 @@ else:
 gimp_plugins_dir = os.environ.get(
     'GIMP_PLUGIN_DIR', default_plugins_dir)
 
-gpi_config_file = gimp_plugins_dir + '.gpi.json'
+gpi_config_file = os.path.join(gimp_plugins_dir, '.gpi.json')
 
 verbose = False
 
@@ -62,10 +62,11 @@ def uninstall(plugin_name):
     directories = []
     for file in index[plugin_name]['files']:
         # TODO remove empty directories
-        if os.path.isdir(gimp_plugins_dir + file):
-            directories.append(gimp_plugins_dir + file)
+        full_path = os.path.join(gimp_plugins_dir, file)
+        if os.path.isdir(full_path):
+            directories.append(full_path)
         else:
-            os.remove(gimp_plugins_dir + file)
+            os.remove(full_path)
 
     del index[plugin_name]
     with open(gpi_config_file, 'w') as f:
