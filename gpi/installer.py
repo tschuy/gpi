@@ -5,7 +5,7 @@ import sys
 # FIXME: Add a sane default path for Windows.
 if sys.platform == 'darwin':
     default_plugins_dir = os.path.expanduser(
-        '~/Library/Application Support/GIMP/2.8/plug-ins'
+        '~/Library/Application Support/GIMP/2.8/plug-ins/'
     )
 elif sys.platform.startswith('linux'):
     default_plugins_dir = os.path.expanduser('~/.gimp-2.8/plug-ins/')
