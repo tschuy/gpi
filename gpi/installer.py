@@ -24,7 +24,7 @@ def install(tar, manifest):
     files = [t for t in tar if t.name.startswith("contents/")]
 
     for t in files:
-        t.name = t.name[9:] # contents/
+        t.name = t.name[9:]  # contents/
         if verbose:
             print "Installing {} to {}/{}".format(
                 t.name, gimp_plugins_dir, t.name)

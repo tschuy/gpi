@@ -4,8 +4,8 @@ import os
 import sys
 import json
 import argparse
-from installer import install, uninstall
-from web import get_from_web, PackageNotFound, PackageReadError
+from gpi.installer import install, uninstall
+from gpi.web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
     usage="\n"
