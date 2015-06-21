@@ -1,8 +1,19 @@
-import os
 import json
+import os
+import sys
+
+# FIXME: Add a sane default path for Windows.
+if sys.platform == 'darwin':
+    default_plugins_dir = os.path.expanduser(
+        '~/Library/Application Support/GIMP/2.8/plug-ins'
+    )
+elif sys.platform.startswith('linux'):
+    default_plugins_dir = os.path.expanduser('~/.gimp-2.8/plug-ins/')
+else:
+    default_plugins_dir = os.path.expanduser('~/.gimp-2.8/plug-ins/')
 
 gimp_plugins_dir = os.environ.get(
-    'GIMP_PLUGIN_DIR', os.path.expanduser("~/.gimp-2.8/plug-ins/"))
+    'GIMP_PLUGIN_DIR', default_plugins_dir)
 
 gpi_config_file = gimp_plugins_dir + '.gpi.json'
 
