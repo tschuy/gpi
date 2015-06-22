@@ -1,6 +1,6 @@
 # GIMP Plugin Installer
 
-![Build Status](https://travis-ci.org/tschuy/gpi.svg)
+[![Build Status](https://travis-ci.org/tschuy/gpi.svg)](https://travis-ci.org/tschuy/gpi)
 
 Install GIMP plugins from the command line with a simple, easy to use package
 manager.
@@ -53,8 +53,11 @@ GIMP, and verify your plugin works as expected.
 Testing gpi
 -----------
 
-Currently, ``gpi`` has no tests. This is a major issue and will be rectified as
-soon as possible.
+Currently, ``gpi`` has very limited tests. Pull requests with additional tests
+are happily accepted!
+
+``gpi`` uses Python's built-in ``unittest`` library. To run the tests, run
+``python setup.py test`` within the root of the repository.
 
 Issues
 ------
