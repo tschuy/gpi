@@ -61,9 +61,9 @@ def main():
         else:
             print("Could not uninstall {}!".format(args.command[1]))
     elif args.command[0] == 'info':
-        info(args.command[1])
+        print(info(args.command[1]))
     elif args.command[0] == 'list':
-        list_installed()
+        print(list_installed())
 
 
 if __name__ == "__main__":
