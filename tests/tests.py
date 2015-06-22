@@ -50,3 +50,10 @@ class InstallerTest(unittest.TestCase):
     def test_uninstall_nonexistent(self):
         uninstall_success = installer.uninstall('nonexistent')
         self.assertFalse(uninstall_success)
+
+    def test_info_local(self):
+        installer.install(self.t, self.manifest)
+        self.assertEqual(installer.info('imguruploader'),
+                         "Name: imguruploader\n" \
+                         "Version: 0.1.0\n" \
+                         "Installed: True\n")
