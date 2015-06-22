@@ -4,7 +4,7 @@ import urllib2
 import json
 import tarfile
 
-host = os.environ.get('GPI_HOST', "http://gpi.tschuy.com")
+host = os.environ.get('GPI_HOST', "https://gpi.tschuy.com")
 
 
 class PackageNotFound(Exception):
