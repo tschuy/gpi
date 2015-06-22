@@ -28,7 +28,8 @@ if args.file and args.command[0] != "install":
 if args.file and len(args.command) > 1:
     exit("Specify either a file or a package name!")
 
-if len(args.command) < 2 and not args.file:
+# FIXME: Argument parsing is a total hack right now
+if len(args.command) < 2 and not args.file and args.command[0] != 'list':
     exit("Usage: gpi [command] [package]")
 
 
