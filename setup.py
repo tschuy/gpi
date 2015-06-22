@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name='gpi',
-    version='0.1.0',
+    version='0.1.1',
     author=u'Evan Tschuy',
     author_email='evantschuy@gmail.com',
     packages=find_packages(),
