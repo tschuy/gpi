@@ -5,9 +5,11 @@ if [ $? -ne 0 ]; then
 	return 1
 fi
 
-/usr/bin/env flake8 "$(git rev-parse --show-toplevel)"/
-if [ $? -ne 0 ]; then
-	return 1
+if hash flake8 2>/dev/null; then
+    /usr/bin/env flake8 "$(git rev-parse --show-toplevel)"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
 fi
 
 return 0
