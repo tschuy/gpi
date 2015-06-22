@@ -42,6 +42,11 @@ class InstallerTest(unittest.TestCase):
 
     def test_uninstall(self):
         installer.install(self.t, self.manifest)
-        installer.uninstall('imguruploader')
+        uninstall_success = installer.uninstall('imguruploader')
         self.assertFalse(os.path.isfile(
             os.path.join(self.test_dir, 'upload.py')))
+        self.assertTrue(uninstall_success)
+
+    def test_uninstall_nonexistent(self):
+        uninstall_success = installer.uninstall('nonexistent')
+        self.assertFalse(uninstall_success)

@@ -56,6 +56,8 @@ def install(tar, manifest):
 
 
 def uninstall(plugin_name):
+    if not os.path.isfile(gpi_config_file):
+        return False
     with open(gpi_config_file, 'r') as f:
         index = json.load(f)
         if plugin_name not in index:
