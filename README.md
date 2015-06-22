@@ -59,6 +59,11 @@ are happily accepted!
 ``gpi`` uses Python's built-in ``unittest`` library. To run the tests, run
 ``python setup.py test`` within the root of the repository.
 
+A pre-commit hook has been provided for your convenience. This hook runs the
+test suite (which takes approximately two seconds) and the PEP8 flaker. (For
+the flaker to work, install ``flake8`` with pip.) To use this hook, copy
+``tests/pre-commit`` into ``.git/hooks/``.
+
 Issues
 ------
 

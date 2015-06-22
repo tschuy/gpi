@@ -1,0 +1,13 @@
+#!/bin/sh
+
+/usr/bin/env python2 "$(git rev-parse --show-toplevel)"/setup.py test
+if [ $? -ne 0 ]; then
+	return 1
+fi
+
+/usr/bin/env flake8 "$(git rev-parse --show-toplevel)"/
+if [ $? -ne 0 ]; then
+	return 1
+fi
+
+return 0
