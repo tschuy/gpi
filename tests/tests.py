@@ -66,3 +66,17 @@ class InstallerTest(unittest.TestCase):
                          "Name: exportlayers\n"
                          "Available versions: 2.3.0\n"
                          "Installed: False")
+
+    def test_info(self):
+        self.assertEqual(installer.remote_info('imguruploader'),
+                         "Name: imguruploader\n"
+                         "Available versions: 0.1.0\n"
+                         "Installed: False")
+        installer.install(self.t, self.manifest)
+        with open(os.path.join(self.test_dir, '.gpi.json'), 'r') as index:
+            self.assertEqual(
+                installer.local_info('imguruploader',
+                                     json.load(index)['imguruploader']),
+                "Name: imguruploader\n"
+                "Version: 0.1.0\n"
+                "Installed: True")
