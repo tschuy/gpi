@@ -11,5 +11,6 @@ setup(
     license='',
     scripts=['bin/gpi'],
     description="The GIMP Plugin Installer command-line tool",
-    long_description=open('README.md').read()
+    long_description=open('README.md').read(),
+    test_suite="tests"
 )
