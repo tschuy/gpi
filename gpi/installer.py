@@ -106,7 +106,7 @@ def local_info(plugin_name, plugin_metadata):
     if 'description' in plugin_metadata:
         info += 'Description: {}\n'.format(plugin_metadata['description'])
     info += 'Version: {}\n'.format(plugin_metadata['version'])
-    info += 'Installed: True\n'
+    info += 'Installed: True'
     return info
 
 
@@ -130,7 +130,7 @@ def remote_info(plugin_name):
     if 'description' in plugin_info:
         info += 'Description: {}\n'.format(plugin_info['description'])
     info += 'Available versions: {}\n'.format(pretty_available_versions)
-    info += 'Installed: False\n'
+    info += 'Installed: False'
     return info
 
 
