@@ -1,17 +1,21 @@
 #!/usr/bin/env python
-import tarfile
+
+import argparse
+import json
 import os
 import sys
-import json
-import argparse
-from gpi.installer import install, uninstall
+import tarfile
+
+from gpi.installer import install, uninstall, info, list_installed
 from gpi.web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
     usage="\n"
-    "       gpi install [package]\n"
-    "       gpi install -f [file]\n"
-    "       gpi uninstall [package]")
+    "       gpi install <package>\n"
+    "       gpi install -f <file>\n"
+    "       gpi uninstall <package>\n"
+    "       gpi info <package>\n"
+    "       gpi list")
 
 parser.add_argument('command', nargs='+')
 parser.add_argument("-f", "--file", help="install from file", default=False,
@@ -24,7 +28,8 @@ if args.file and args.command[0] != "install":
 if args.file and len(args.command) > 1:
     exit("Specify either a file or a package name!")
 
-if len(args.command) < 2 and not args.file:
+# FIXME: Argument parsing is a total hack right now
+if len(args.command) < 2 and not args.file and args.command[0] != 'list':
     exit("Usage: gpi [command] [package]")
 
 
@@ -55,6 +60,11 @@ def main():
             print("{} uninstalled successfully!".format(args.command[1]))
         else:
             print("Could not uninstall {}!".format(args.command[1]))
+    elif args.command[0] == 'info':
+        print(info(args.command[1]))
+    elif args.command[0] == 'list':
+        print(list_installed())
+
 
 if __name__ == "__main__":
     sys.path.append(

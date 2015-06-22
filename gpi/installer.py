@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+from gpi.web import get_package_info, PackageNotFound
+
 # FIXME: Add a sane default path for Windows.
 if sys.platform == 'darwin':
     default_plugins_dir = os.path.expanduser(
@@ -73,3 +75,72 @@ def uninstall(plugin_name):
         f.write(json.dumps(index))
 
     return True
+
+
+def info(plugin_name):
+    """Lists all installed packages registered with gpi.
+    Always lists the package name and whether it is installed.
+    If the package is installed the installed version is listed.
+    If the package is not installed the available versions are listed.
+    If there is a package description, print that too.
+    """
+    # Note that we rely on the API giving us a dictionary with a 'releases' key
+    # which holds a list of dictionaries, each containing a 'version' key.
+    # We rely on the package in the GPI config file to have a 'version' key.
+
+    # Handle the case where the config file doesn't exist. This may happen if
+    # nothing has been installed before.
+    if os.path.isfile(gpi_config_file):
+        with open(gpi_config_file, 'r') as f:
+            index = json.load(f)
+        if plugin_name in index:
+            return local_info(plugin_name, index[plugin_name])
+    return remote_info(plugin_name)
+
+
+def local_info(plugin_name, plugin_metadata):
+    """Return human readable info about an installed package"""
+    info = 'Name: {}\n'.format(plugin_name)
+    if 'description' in plugin_metadata:
+        info += 'Description: {}\n'.format(plugin_metadata['description'])
+    info += 'Version: {}\n'.format(plugin_metadata['version'])
+    info += 'Installed: True\n'
+    return info
+
+
+def remote_info(plugin_name):
+    """Return human readable info about a package which is not installed.
+    Fetches info from the server."""
+    try:
+        plugin_info = get_package_info(plugin_name)
+    except PackageNotFound:
+        return ('Sorry, a package named' +
+                '{} couldn\'t be found :( \n').format(plugin_name)
+    available_versions = map(
+        lambda release: release['version'],
+        plugin_info['releases']
+    )
+    pretty_available_versions = reduce(
+        lambda available, version: available + ', ' + version,
+        available_versions
+    )
+    info = 'Name: {}\n'.format(plugin_name)
+    if 'description' in plugin_info:
+        info += 'Description: {}\n'.format(plugin_info['description'])
+    info += 'Available versions: {}\n'.format(pretty_available_versions)
+    info += 'Installed: False\n'
+    return info
+
+
+def list_installed():
+    """Returns a list of all installed packages registered with gpi"""
+    if os.path.isfile(gpi_config_file):
+        with open(gpi_config_file, 'r') as f:
+            index = json.load(f)
+        installed = ''
+        for plugin in index:
+            version = index[plugin]['version']
+            installed += '{}=={}\n'.format(plugin, version)
+        return installed
+    else:
+        return ''
