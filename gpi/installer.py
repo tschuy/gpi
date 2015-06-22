@@ -97,6 +97,7 @@ def info(plugin_name):
             return local_info(plugin_name, index[plugin_name])
     return remote_info(plugin_name)
 
+
 def local_info(plugin_name, plugin_metadata):
     """Return human readable info about an installed package"""
     info = 'Name: {}\n'.format(plugin_name)
@@ -106,6 +107,7 @@ def local_info(plugin_name, plugin_metadata):
     info += 'Installed: True\n'
     return info
 
+
 def remote_info(plugin_name):
     """Return human readable info about a package which is not installed.
     Fetches info from the server."""
@@ -113,7 +115,7 @@ def remote_info(plugin_name):
         plugin_info = get_package_info(plugin_name)
     except PackageNotFound:
         return ('Sorry, a package named' +
-            '{} couldn\'t be found :( \n').format(plugin_name)
+                '{} couldn\'t be found :( \n').format(plugin_name)
     available_versions = map(
         lambda release: release['version'],
         plugin_info['releases']
@@ -123,8 +125,8 @@ def remote_info(plugin_name):
         available_versions
     )
     info = 'Name: {}\n'.format(plugin_name)
-    if 'description' in plugin_metadata:
-        info += 'Description: {}\n'.format(plugin_metadata['description'])
+    if 'description' in plugin_info:
+        info += 'Description: {}\n'.format(plugin_info['description'])
     info += 'Available versions: {}\n'.format(pretty_available_versions)
     info += 'Installed: False\n'
     return info
@@ -138,7 +140,7 @@ def list_installed():
         installed = ''
         for plugin in index:
             version = index[plugin]['version']
-            installed +='{}=={}\n'.format(plugin, version)
+            installed += '{}=={}\n'.format(plugin, version)
         return installed
     else:
         return ''
