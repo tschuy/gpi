@@ -43,4 +43,4 @@ def get_from_web(package_name, package_url=None):
     try:
         return tarfile.open(fileobj=io.BytesIO(file), mode='r')
     except:
-        raise PackageReadError(url)
+        raise PackageReadError(package_url)
