@@ -33,11 +33,12 @@ def get_package_info(package_name):
     return package_info
 
 
-def get_from_web(package_name):
-    package_info = get_package_info(package_name)
-    url = "{}{}".format(
-        host, package_info['releases'][0]['file'])
-    file = urllib2.urlopen(url).read()
+def get_from_web(package_name, package_url=None):
+    if not package_url:
+        package_info = get_package_info(package_name)
+        package_url = "{}{}".format(
+            host, package_info['releases'][0]['file'])
+    file = urllib2.urlopen(package_url).read()
 
     try:
         return tarfile.open(fileobj=io.BytesIO(file), mode='r')
