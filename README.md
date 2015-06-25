@@ -43,10 +43,16 @@ Your ``gpi.json`` file should look like this:
     "identifier": "imguruploader",
     "author": "tschuy",
     "license": "MIT",
+    "type": "python",
     "url": "https://github.com/tschuy/gimp-export-to-imgur",
     "description": "Upload your images to Imgur directly from the Save menu"
 }
 ```
+
+The type of a plugin can either by ``python`` or ``scriptfu``. If it is missing,
+``gpi`` will assume the plugin is Python and extract it to the ``plug-ins``
+directory.
+
 To test your plugin, pass your ``.tar.gz`` to gpi with the ``-f`` flag. Open
 GIMP, and verify your plugin works as expected.
 

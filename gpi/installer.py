@@ -6,18 +6,18 @@ from gpi.web import get_package_info, PackageNotFound
 
 # FIXME: Add a sane default path for Windows.
 if sys.platform == 'darwin':
-    default_plugins_dir = os.path.expanduser(
-        '~/Library/Application Support/GIMP/2.8/plug-ins/'
+    default_config_dir = os.path.expanduser(
+        '~/Library/Application Support/GIMP/2.8/'
     )
 elif sys.platform.startswith('linux'):
-    default_plugins_dir = os.path.expanduser('~/.gimp-2.8/plug-ins/')
+    default_config_dir = os.path.expanduser('~/.gimp-2.8/')
 else:
-    default_plugins_dir = os.path.expanduser('~/.gimp-2.8/plug-ins/')
+    default_config_dir = os.path.expanduser('~/.gimp-2.8/')
 
-gimp_plugins_dir = os.environ.get(
-    'GIMP_PLUGIN_DIR', default_plugins_dir)
+gimp_config_dir = os.environ.get(
+    'GIMP_CONFIG_DIR', default_config_dir)
 
-gpi_config_file = os.path.join(gimp_plugins_dir, '.gpi.json')
+gpi_config_file = os.path.join(gimp_config_dir, '.gpi.json')
 
 verbose = False
 
@@ -27,6 +27,13 @@ def is_non_zero_file(path):
         path) and os.path.getsize(path) > 0 else False
 
 
+def plugin_subdir(plugin_type):
+    if plugin_type == 'scriptfu':
+        return os.path.join(gimp_config_dir, 'scripts')
+    else:
+        return os.path.join(gimp_config_dir, 'plug-ins')
+
+
 def install(tar, manifest):
     if not is_non_zero_file(gpi_config_file):
         index = {}
@@ -34,25 +41,28 @@ def install(tar, manifest):
         with open(gpi_config_file, 'r') as f:
             index = json.load(f)
 
+    directory = plugin_subdir(manifest.get('type', 'python'))
+
     files = [t for t in tar if t.name.startswith("contents/")]
 
     for t in files:
         t.name = t.name[9:]  # contents/
         if verbose:
             print "Installing {} to {}/{}".format(
-                t.name, gimp_plugins_dir, t.name)
+                t.name, directory, t.name)
 
     plugin_info = {
         'version': manifest['version'],
         'name': manifest['name'],
-        'files': [file.name for file in files]
+        'files': [file.name for file in files],
+        'type': manifest.get('type', 'python')
     }
     index[manifest['identifier']] = plugin_info
 
     with open(gpi_config_file, 'w') as f:
         f.write(json.dumps(index))
 
-    tar.extractall(gimp_plugins_dir, members=files)
+    tar.extractall(directory, members=files)
 
 
 def uninstall(plugin_name):
@@ -63,10 +73,11 @@ def uninstall(plugin_name):
         if plugin_name not in index:
             return False
 
+    directory = plugin_subdir(index[plugin_name]['type'])
     directories = []
     for file in index[plugin_name]['files']:
         # TODO remove empty directories
-        full_path = os.path.join(gimp_plugins_dir, file)
+        full_path = os.path.join(directory, file)
         if os.path.isdir(full_path):
             directories.append(full_path)
         else:
@@ -106,6 +117,7 @@ def local_info(plugin_name, plugin_metadata):
     if 'description' in plugin_metadata:
         info += 'Description: {}\n'.format(plugin_metadata['description'])
     info += 'Version: {}\n'.format(plugin_metadata['version'])
+    info += 'Type: {}\n'.format(plugin_metadata['type'])
     info += 'Installed: True'
     return info
 
