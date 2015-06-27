@@ -73,6 +73,7 @@ the flaker to work, install ``flake8`` with pip.) To use this hook, copy
 Issues
 ------
 
+0. GIMP plugin for installing plugins!
 1. Remove empty folders on uninstall
 2. Catch duplicate files and disallow uninstallation (or fix GIMP to allow recursive plugin finding)
 3. Install plugins from git
@@ -80,3 +81,31 @@ Issues
 5. Code cleanup
 6. Allow the use of a virtualenv to install packages from pip
 7. Add verbose mode
+
+Architecture
+------------
+
+``gpi``'s backend is laid out into two different install modules, with a
+separate executable for the command line program and, soon, a fourth file for
+mangaging plugins directly from GIMP itself.
+
+Anything web-related goes in ``gpi.web``. These functions interface with the
+web portion of GPI, so the ``get_from_web`` function that returns a ``tarfile``
+object for a given package name lives in here, as does the function to get
+package info from the API.
+
+``gpi.web`` is currently in need of tests.
+
+In ``gpi.installer`` lives the generic installer/uninstaller functions. Here you
+can install a plugin with ``gpi.installler.install``, uninstall with
+``gpi.installler.uninstall``. This module also holds some generic information
+like the ``info`` commands for getting local/remote package info, as well as
+the plugin list. These should be moved to more appropriate modules in the
+future.
+
+``gpi.installer`` is currently well-tested.
+
+Lastly, the command line executable lives in ``bin/gpi``. This executable is
+home to the args parsing, and decides which code paths to take.
+
+``bin/gpi`` needs tests, and should be re-written.
