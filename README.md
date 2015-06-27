@@ -70,18 +70,6 @@ test suite (which takes approximately two seconds) and the PEP8 flaker. (For
 the flaker to work, install ``flake8`` with pip.) To use this hook, copy
 ``tests/pre-commit`` into ``.git/hooks/``.
 
-Issues
-------
-
-0. GIMP plugin for installing plugins!
-1. Remove empty folders on uninstall
-2. Catch duplicate files and disallow uninstallation (or fix GIMP to allow recursive plugin finding)
-3. Install plugins from git
-4. Documentation
-5. Code cleanup
-6. Allow the use of a virtualenv to install packages from pip
-7. Add verbose mode
-
 Architecture
 ------------
 
