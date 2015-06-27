@@ -34,7 +34,10 @@ def plugin_subdir(plugin_type):
         return os.path.join(gimp_config_dir, 'plug-ins')
 
 
-def install(tar, manifest):
+def install(tar, manifest=None):
+    if manifest is None:
+        manifest = json.load(tar.extractfile('gpi.json'))
+
     if not is_non_zero_file(gpi_config_file):
         index = {}
     else:

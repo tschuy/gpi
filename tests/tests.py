@@ -44,8 +44,25 @@ class InstallerTest(unittest.TestCase):
         self.assertEqual(installer.plugin_subdir('python'),
                          os.path.join(self.test_dir, 'plug-ins'))
 
+    def test_install_different_manifest(self):
+        test_manifest = self.manifest.copy()
+        test_manifest['version'] = '0.2.0'
+        installer.install(self.t, manifest=test_manifest)
+
+        with open(self.gpi_config, 'r') as index:
+            expected_index = {
+                "imguruploader": {
+                    "files": ["upload.py"],
+                    "version": "0.2.0",
+                    "type": "python",
+                    "name": "Imgur Uploader"}
+                }
+            self.assertEqual(json.load(index), expected_index)
+        self.assertTrue(os.path.isfile(
+            os.path.join(self.test_dir, 'plug-ins', 'upload.py')))
+
     def test_install(self):
-        installer.install(self.t, self.manifest)
+        installer.install(self.t)
 
         with open(self.gpi_config, 'r') as index:
             expected_index = {
@@ -63,8 +80,7 @@ class InstallerTest(unittest.TestCase):
         t = tarfile.open(
             os.path.join(self.current_dir,
                          'data', 'imguruploader-scriptfu.tar.gz'), 'r')
-        manifest = json.load(t.extractfile('gpi.json'))
-        installer.install(t, manifest)
+        installer.install(t)
 
         with open(self.gpi_config, 'r') as index:
             expected_index = {
@@ -82,8 +98,7 @@ class InstallerTest(unittest.TestCase):
         t = tarfile.open(
             os.path.join(self.current_dir,
                          'data', 'imguruploader-scriptfu.tar.gz'), 'r')
-        manifest = json.load(self.t.extractfile('gpi.json'))
-        installer.install(t, manifest)
+        installer.install(t)
 
         uninstall_success = installer.uninstall('imguruploader')
         self.assertFalse(os.path.isfile(
@@ -91,7 +106,7 @@ class InstallerTest(unittest.TestCase):
         self.assertTrue(uninstall_success)
 
     def test_uninstall_scriptfu(self):
-        installer.install(self.t, self.manifest)
+        installer.install(self.t)
         uninstall_success = installer.uninstall('imguruploader')
         self.assertFalse(os.path.isfile(
             os.path.join(self.test_dir, 'plug-ins', 'upload.py')))
@@ -102,7 +117,7 @@ class InstallerTest(unittest.TestCase):
         self.assertFalse(uninstall_success)
 
     def test_info_local(self):
-        installer.install(self.t, self.manifest)
+        installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
             self.assertEqual(
                 installer.local_info('imguruploader',
@@ -123,7 +138,7 @@ class InstallerTest(unittest.TestCase):
                          "Name: imguruploader\n"
                          "Available versions: 0.1.0\n"
                          "Installed: False")
-        installer.install(self.t, self.manifest)
+        installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
             self.assertEqual(
                 installer.local_info('imguruploader',
