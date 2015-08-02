@@ -136,7 +136,7 @@ class InstallerTest(unittest.TestCase):
     def test_info(self):
         self.assertEqual(installer.remote_info('imguruploader'),
                          "Name: imguruploader\n"
-                         "Available versions: 0.1.0\n"
+                         "Available versions: 0.1.1, 0.1.0\n"
                          "Installed: False")
         installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
@@ -147,3 +147,8 @@ class InstallerTest(unittest.TestCase):
                 "Version: 0.1.0\n"
                 "Type: python\n"
                 "Installed: True")
+
+    def test_currently_installed(self):
+        installer.install(self.t)
+        self.assertEqual(installer.currently_installed(),
+                         [{'name': 'Imgur Uploader', 'version': '0.1.0'}])

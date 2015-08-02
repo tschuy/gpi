@@ -6,7 +6,7 @@ import os
 import sys
 import tarfile
 
-from gpi.installer import install, uninstall, info, list_installed
+from gpi.installer import install, uninstall, info, currently_installed
 from gpi.web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
@@ -63,7 +63,11 @@ def main():
     elif args.command[0] == 'info':
         print(info(args.command[1]))
     elif args.command[0] == 'list':
-        print(list_installed())
+        current_packages = ""
+        for package in currently_installed():
+            current_packages += "{}=={}\n".format(package['name'], package['version'])
+        # chop off last newline
+        print(current_packages[:-1])
 
 
 if __name__ == "__main__":

@@ -125,16 +125,6 @@ def local_info(plugin_name, plugin_metadata):
     return info
 
 
-def currently_installed():
-    if os.path.isfile(gpi_config_file):
-        with open(gpi_config_file, 'r') as f:
-            index = json.load(f)
-        return [{'name': index[i]['name']} for i in index]
-    else:
-        return []
-
-
-
 def remote_info(plugin_name):
     """Return human readable info about a package which is not installed.
     Fetches info from the server."""
@@ -159,15 +149,12 @@ def remote_info(plugin_name):
     return info
 
 
-def list_installed():
-    """Returns a list of all installed packages registered with gpi"""
+def currently_installed():
     if os.path.isfile(gpi_config_file):
         with open(gpi_config_file, 'r') as f:
             index = json.load(f)
-        installed = ''
-        for plugin in index:
-            version = index[plugin]['version']
-            installed += '{}=={}\n'.format(plugin, version)
-        return installed
+        return [
+            {'name': index[i]['name'], 'version': index[i]['version']}
+            for i in index]
     else:
-        return ''
+        return []
