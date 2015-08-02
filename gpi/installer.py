@@ -62,7 +62,7 @@ def install(tar, manifest=None):
     }
     index[manifest['identifier']] = plugin_info
 
-    with open(gpi_config_file, 'w') as f:
+    with open(gpi_config_file, 'w+') as f:
         f.write(json.dumps(index))
 
     tar.extractall(directory, members=files)
@@ -123,6 +123,16 @@ def local_info(plugin_name, plugin_metadata):
     info += 'Type: {}\n'.format(plugin_metadata['type'])
     info += 'Installed: True'
     return info
+
+
+def currently_installed():
+    if os.path.isfile(gpi_config_file):
+        with open(gpi_config_file, 'r') as f:
+            index = json.load(f)
+        return [{'name': index[i]['name']} for i in index]
+    else:
+        return []
+
 
 
 def remote_info(plugin_name):

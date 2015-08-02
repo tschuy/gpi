@@ -21,6 +21,15 @@ class PackageReadError(Exception):
         super(PackageReadError, self).__init__(url)
 
 
+def get_packages():
+    """Retrieves a list of available packages from the GPI host"""
+    url = "{}/api/packages".format(host)
+    response = urllib2.urlopen(url)
+
+    packages = json.loads(response.read())
+    return packages
+
+
 def get_package_info(package_name):
     """Retrieve the package metadata as json from the GPI host"""
     url = "{}/api/package/{}".format(host, package_name)
