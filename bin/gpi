@@ -61,7 +61,31 @@ def main():
         else:
             print("Could not uninstall {}!".format(args.command[1]))
     elif args.command[0] == 'info':
-        print(info(args.command[1]))
+        try:
+            package_dict = info(args.command[1])
+        except PackageNotFound:
+            print('Sorry, a package named' +
+                  " {} couldn\'t be found :(".format(args.command[1]))
+            return
+
+        package_info = "Name: {}\n".format(package_dict['name'])
+        if package_dict['description']:
+            package_info += "Description: {}\n".format(package_dict['description'])
+        if package_dict['installed']:
+            package_info += "Version: {}\n".format(package_dict['version'])
+        else:
+            available_versions = map(
+                lambda release: release['version'],
+                package_dict['versions_available']
+            )
+            pretty_available_versions = reduce(
+                lambda available, version: available + ', ' + version,
+                available_versions
+            )
+            package_info += 'Available versions: {}\n'.format(pretty_available_versions)
+        package_info += "Installed: {}".format(package_dict['installed'])
+        print(package_info)
+
     elif args.command[0] == 'list':
         current_packages = ""
         for package in currently_installed():

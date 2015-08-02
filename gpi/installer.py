@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from gpi.web import get_package_info, PackageNotFound
+from gpi.web import get_package_info
 
 # FIXME: Add a sane default path for Windows.
 if sys.platform == 'darwin':
@@ -115,38 +115,26 @@ def info(plugin_name):
 
 
 def local_info(plugin_name, plugin_metadata):
-    """Return human readable info about an installed package"""
-    info = 'Name: {}\n'.format(plugin_name)
-    if 'description' in plugin_metadata:
-        info += 'Description: {}\n'.format(plugin_metadata['description'])
-    info += 'Version: {}\n'.format(plugin_metadata['version'])
-    info += 'Type: {}\n'.format(plugin_metadata['type'])
-    info += 'Installed: True'
-    return info
+    """Return info about an installed package as a dict"""
+    return dict(
+        name=plugin_name,
+        description=plugin_metadata.get('description'),
+        version=plugin_metadata['version'],
+        installed=True)
 
 
 def remote_info(plugin_name):
     """Return human readable info about a package which is not installed.
-    Fetches info from the server."""
-    try:
-        plugin_info = get_package_info(plugin_name)
-    except PackageNotFound:
-        return ('Sorry, a package named' +
-                '{} couldn\'t be found :( \n').format(plugin_name)
-    available_versions = map(
-        lambda release: release['version'],
-        plugin_info['releases']
-    )
-    pretty_available_versions = reduce(
-        lambda available, version: available + ', ' + version,
-        available_versions
-    )
-    info = 'Name: {}\n'.format(plugin_name)
-    if 'description' in plugin_info:
-        info += 'Description: {}\n'.format(plugin_info['description'])
-    info += 'Available versions: {}\n'.format(pretty_available_versions)
-    info += 'Installed: False'
-    return info
+    Fetches info from the server.
+
+    Will raise a PackageNotFound exception if the package doesn't exist
+    locally or remotely."""
+    plugin_info = get_package_info(plugin_name)
+    return dict(
+        name=plugin_name,
+        description=plugin_info.get('description'),
+        versions_available=plugin_info['releases'],
+        installed=False)
 
 
 def currently_installed():

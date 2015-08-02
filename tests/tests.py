@@ -122,31 +122,56 @@ class InstallerTest(unittest.TestCase):
             self.assertEqual(
                 installer.local_info('imguruploader',
                                      json.load(index)['imguruploader']),
-                "Name: imguruploader\n"
-                "Version: 0.1.0\n"
-                "Type: python\n"
-                "Installed: True")
+                {
+                    'installed': True,
+                    'version': '0.1.0',
+                    'description': None,
+                    'name': 'imguruploader'
+                })
 
     def test_info_remote(self):
-        self.assertEqual(installer.remote_info('exportlayers'),
-                         "Name: exportlayers\n"
-                         "Available versions: 2.3.0\n"
-                         "Installed: False")
+        self.assertEqual(
+            installer.remote_info('exportlayers'),
+            {
+                'name': 'exportlayers',
+                'versions_available': [{
+                    'version': "2.3.0",
+                    'file': '/uploads/exportlayers/2.3.0/'
+                            'exportlayers-2.3.0.tar.gz'
+                }],
+                'description': None,
+                'installed': False
+            })
 
     def test_info(self):
-        self.assertEqual(installer.remote_info('imguruploader'),
-                         "Name: imguruploader\n"
-                         "Available versions: 0.1.1, 0.1.0\n"
-                         "Installed: False")
+        self.assertEqual(
+            installer.remote_info('imguruploader'),
+            {
+                'name': 'imguruploader',
+                'versions_available': [{
+                    'version': "0.1.1",
+                    'file': '/uploads/imguruploader/0.1.1/'
+                    'imguruploader-0.1.1.tar.gz'
+                    },
+                    {
+                    'version': "0.1.0",
+                    'file': '/uploads/imguruploader/0.1.0/'
+                    'imguruploader-0.1.0.tar_nJzegdA.gz'
+                }],
+                'description': None,
+                'installed': False
+            })
         installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
             self.assertEqual(
                 installer.local_info('imguruploader',
                                      json.load(index)['imguruploader']),
-                "Name: imguruploader\n"
-                "Version: 0.1.0\n"
-                "Type: python\n"
-                "Installed: True")
+                {
+                    'installed': True,
+                    'version': '0.1.0',
+                    'description': None,
+                    'name': 'imguruploader'
+                })
 
     def test_currently_installed(self):
         installer.install(self.t)
