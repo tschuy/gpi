@@ -77,12 +77,19 @@ def uninstall(plugin_name):
             return False
 
     directory = plugin_subdir(index[plugin_name]['type'])
-    directories = []
+    # sorting by negative length means we remove files in a dir before removing
+    # the directory
+    index[plugin_name]['files'].sort(key=lambda x: -1*len(x))
     for file in index[plugin_name]['files']:
         # TODO remove empty directories
         full_path = os.path.join(directory, file)
         if os.path.isdir(full_path):
-            directories.append(full_path)
+            try:
+                os.rmdir(full_path)
+            except OSError as e:
+                # An OSError here generally means the directory is not empty.
+                # This is generally due to plugins with conflicting directories.
+                pass
         else:
             os.remove(full_path)
 

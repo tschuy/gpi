@@ -21,6 +21,7 @@ class InstallerTest(unittest.TestCase):
             shutil.rmtree(self.script_dir)
         if os.path.isdir(self.plugin_dir):
             shutil.rmtree(self.plugin_dir)
+
         os.makedirs(self.plugin_dir)
         os.makedirs(self.script_dir)
 
@@ -103,6 +104,24 @@ class InstallerTest(unittest.TestCase):
         uninstall_success = installer.uninstall('imguruploader')
         self.assertFalse(os.path.isfile(
             os.path.join(self.test_dir, 'scripts', 'upload.py')))
+        self.assertTrue(uninstall_success)
+
+    def test_uninstall_dirs(self):
+        t1 = tarfile.open(
+            os.path.join(self.current_dir, 'data', 'dir1.tar.gz'), 'r')
+        t2 = tarfile.open(
+            os.path.join(self.current_dir, 'data', 'dir2.tar.gz'), 'r')
+        installer.install(t1)
+        installer.install(t2)
+        uninstall_success = installer.uninstall('containsdir1')
+
+        # biz and its sub-dirs and files are only written by dir1
+        self.assertFalse(os.path.isdir(
+            os.path.join(self.test_dir, 'plug-ins', 'biz')))
+
+        # foo/ is written by dir1 and dir2, but foo/baz is only written by dir1
+        self.assertFalse(os.path.isdir(
+            os.path.join(self.test_dir, 'plug-ins', 'foo', 'baz')))
         self.assertTrue(uninstall_success)
 
     def test_uninstall_scriptfu(self):
