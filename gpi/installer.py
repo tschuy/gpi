@@ -19,7 +19,13 @@ gimp_config_dir = os.environ.get(
 
 gpi_config_file = os.path.join(gimp_config_dir, '.gpi.json')
 
-verbose = False
+
+class OverlapException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 
 def is_non_zero_file(path):
@@ -39,7 +45,7 @@ def install(tar, manifest=None):
         manifest = json.load(tar.extractfile('gpi.json'))
 
     if not is_non_zero_file(gpi_config_file):
-        index = {}
+        index = {'files': {}, 'packages': {}}
     else:
         with open(gpi_config_file, 'r') as f:
             index = json.load(f)
@@ -50,9 +56,10 @@ def install(tar, manifest=None):
 
     for t in files:
         t.name = t.name[9:]  # contents/
-        if verbose:
-            print "Installing {} to {}/{}".format(
-                t.name, directory, t.name)
+        if t.name in index['files'].keys():
+            # fail only if the overlap is not a directory
+            if t.isfile():
+                raise OverlapException(t.name)
 
     plugin_info = {
         'version': manifest['version'],
@@ -60,7 +67,9 @@ def install(tar, manifest=None):
         'files': [file.name for file in files],
         'type': manifest.get('type', 'python')
     }
-    index[manifest['identifier']] = plugin_info
+    index['packages'][manifest['identifier']] = plugin_info
+    for f in plugin_info['files']:
+        index['files'][f] = manifest['identifier']
 
     with open(gpi_config_file, 'w+') as f:
         f.write(json.dumps(index))
@@ -73,27 +82,30 @@ def uninstall(plugin_name):
         return False
     with open(gpi_config_file, 'r') as f:
         index = json.load(f)
-        if plugin_name not in index:
+        if plugin_name not in index['packages']:
             return False
 
-    directory = plugin_subdir(index[plugin_name]['type'])
+    directory = plugin_subdir(index['packages'][plugin_name]['type'])
     # sorting by negative length means we remove files in a dir before removing
     # the directory
-    index[plugin_name]['files'].sort(key=lambda x: -1*len(x))
-    for file in index[plugin_name]['files']:
-        # TODO remove empty directories
+    index['packages'][plugin_name]['files'].sort(key=lambda x: -1*len(x))
+    for file in index['packages'][plugin_name]['files']:
         full_path = os.path.join(directory, file)
         if os.path.isdir(full_path):
             try:
                 os.rmdir(full_path)
-            except OSError as e:
+            except OSError:
                 # An OSError here generally means the directory is not empty.
-                # This is generally due to plugins with conflicting directories.
+                # This is generally due to plugins with conflicting
+                # directories. This error is ignored because we need need to
+                # keep the dir for other plugins.
                 pass
         else:
             os.remove(full_path)
 
-    del index[plugin_name]
+    for f in index['packages'][plugin_name]['files']:
+        del index['files'][f]
+    del index['packages'][plugin_name]
     with open(gpi_config_file, 'w') as f:
         f.write(json.dumps(index))
 
@@ -115,9 +127,9 @@ def info(plugin_name):
     # nothing has been installed before.
     if os.path.isfile(gpi_config_file):
         with open(gpi_config_file, 'r') as f:
-            index = json.load(f)
-        if plugin_name in index:
-            return local_info(plugin_name, index[plugin_name])
+            package_index = json.load(f)['packages']
+        if plugin_name in package_index:
+            return local_info(plugin_name, package_index[plugin_name])
     return remote_info(plugin_name)
 
 
@@ -147,9 +159,9 @@ def remote_info(plugin_name):
 def currently_installed():
     if os.path.isfile(gpi_config_file):
         with open(gpi_config_file, 'r') as f:
-            index = json.load(f)
+            package_index = json.load(f)['packages']
         return [
-            {'name': index[i]['name'], 'version': index[i]['version']}
-            for i in index]
+            {'name': package_index[i]['name'], 'version':
+                package_index[i]['version']} for i in package_index]
     else:
         return []

@@ -8,12 +8,15 @@ from gpi import installer
 
 
 class InstallerTest(unittest.TestCase):
+
     def setUp(self):
         self.current_dir = os.path.dirname(os.path.realpath(__file__))
         self.test_dir = os.path.join(self.current_dir, 'testdir')
         self.plugin_dir = os.path.join(self.test_dir, 'plug-ins')
         self.script_dir = os.path.join(self.test_dir, 'scripts')
         self.gpi_config = os.path.join(self.test_dir, '.gpi.json')
+
+        self.maxDiff = None
 
         if os.path.isdir(self.test_dir):
             shutil.rmtree(self.test_dir)
@@ -52,12 +55,18 @@ class InstallerTest(unittest.TestCase):
 
         with open(self.gpi_config, 'r') as index:
             expected_index = {
-                "imguruploader": {
-                    "files": ["upload.py"],
-                    "version": "0.2.0",
-                    "type": "python",
-                    "name": "Imgur Uploader"}
+                "packages": {
+                    "imguruploader": {
+                        "files": ["upload.py"],
+                        "version": "0.2.0",
+                        "type": "python",
+                        "name": "Imgur Uploader"
+                    }
+                },
+                "files": {
+                    "upload.py": "imguruploader"
                 }
+            }
             self.assertEqual(json.load(index), expected_index)
         self.assertTrue(os.path.isfile(
             os.path.join(self.test_dir, 'plug-ins', 'upload.py')))
@@ -67,12 +76,18 @@ class InstallerTest(unittest.TestCase):
 
         with open(self.gpi_config, 'r') as index:
             expected_index = {
-                "imguruploader": {
-                    "files": ["upload.py"],
-                    "version": "0.1.0",
-                    "type": "python",
-                    "name": "Imgur Uploader"}
+                "packages": {
+                    "imguruploader": {
+                        "files": ["upload.py"],
+                        "version": "0.1.0",
+                        "type": "python",
+                        "name": "Imgur Uploader"
+                    }
+                },
+                "files": {
+                    "upload.py": "imguruploader"
                 }
+            }
             self.assertEqual(json.load(index), expected_index)
         self.assertTrue(os.path.isfile(
             os.path.join(self.test_dir, 'plug-ins', 'upload.py')))
@@ -85,12 +100,18 @@ class InstallerTest(unittest.TestCase):
 
         with open(self.gpi_config, 'r') as index:
             expected_index = {
-                "imguruploader": {
-                    "files": ["upload.scm"],
-                    "version": "0.1.0",
-                    "type": "scriptfu",
-                    "name": "Imgur Uploader"}
+                "packages": {
+                    "imguruploader": {
+                        "files": ["upload.scm"],
+                        "version": "0.1.0",
+                        "type": "scriptfu",
+                        "name": "Imgur Uploader"
+                    }
+                },
+                "files": {
+                    "upload.scm": "imguruploader"
                 }
+            }
             self.assertEqual(json.load(index), expected_index)
         self.assertTrue(os.path.isfile(
             os.path.join(self.test_dir, 'scripts', 'upload.scm')))
@@ -139,8 +160,9 @@ class InstallerTest(unittest.TestCase):
         installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
             self.assertEqual(
-                installer.local_info('imguruploader',
-                                     json.load(index)['imguruploader']),
+                installer.local_info(
+                    'imguruploader',
+                    json.load(index)['packages']['imguruploader']),
                 {
                     'installed': True,
                     'version': '0.1.0',
@@ -183,8 +205,9 @@ class InstallerTest(unittest.TestCase):
         installer.install(self.t)
         with open(self.gpi_config, 'r') as index:
             self.assertEqual(
-                installer.local_info('imguruploader',
-                                     json.load(index)['imguruploader']),
+                installer.local_info(
+                    'imguruploader',
+                    json.load(index)['packages']['imguruploader']),
                 {
                     'installed': True,
                     'version': '0.1.0',
@@ -196,3 +219,19 @@ class InstallerTest(unittest.TestCase):
         installer.install(self.t)
         self.assertEqual(installer.currently_installed(),
                          [{'name': 'Imgur Uploader', 'version': '0.1.0'}])
+
+    def test_overlapping_files_fatal(self):
+        # package1 and package2 both contain the file contents/file.py, with
+        # different contents. The installer should return a fatal error.
+        package1 = tarfile.open(
+            os.path.join(self.current_dir,
+                         'data', 'overlappingfiles1.tar.gz'), 'r')
+        package2 = tarfile.open(
+            os.path.join(self.current_dir,
+                         'data', 'overlappingfiles2.tar.gz'), 'r')
+        installer.install(package1)
+        with self.assertRaises(Exception):
+            installer.install(package2)
+
+        self.assertEqual(installer.currently_installed(),
+                         [{'name': 'Overlapping Files 1', 'version': '0.1.0'}])

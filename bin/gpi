@@ -6,7 +6,8 @@ import os
 import sys
 import tarfile
 
-from gpi.installer import install, uninstall, info, currently_installed
+from gpi.installer import (
+    install, uninstall, info, currently_installed, OverlapException)
 from gpi.web import get_from_web, PackageNotFound, PackageReadError
 
 parser = argparse.ArgumentParser(
@@ -50,7 +51,11 @@ def main():
 
         manifest = json.load(t.extractfile('gpi.json'))
         print("Installing version " + manifest['version'])
-        install(t, manifest)
+        try:
+            install(t, manifest)
+        except OverlapException as e:
+            print("Could not install package: conflicting file {}".format(e))
+            sys.exit(1)
         print("{} {} installed successfully!".format(
             manifest['name'], manifest['version']))
 
