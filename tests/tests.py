@@ -218,7 +218,10 @@ class InstallerTest(unittest.TestCase):
     def test_currently_installed(self):
         installer.install(self.t)
         self.assertEqual(installer.currently_installed(),
-                         [{'name': 'Imgur Uploader', 'version': '0.1.0'}])
+                         [{
+                            'identifier': 'imguruploader',
+                            'name': 'Imgur Uploader',
+                            'version': '0.1.0'}])
 
     def test_overlapping_files_fatal(self):
         # package1 and package2 both contain the file contents/file.py, with
@@ -234,4 +237,7 @@ class InstallerTest(unittest.TestCase):
             installer.install(package2)
 
         self.assertEqual(installer.currently_installed(),
-                         [{'name': 'Overlapping Files 1', 'version': '0.1.0'}])
+                         [{
+                            'name': 'Overlapping Files 1',
+                            'version': '0.1.0',
+                            'identifier': 'overlappingfiles1'}])

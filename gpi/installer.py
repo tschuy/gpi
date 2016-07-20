@@ -161,7 +161,7 @@ def currently_installed():
         with open(gpi_config_file, 'r') as f:
             package_index = json.load(f)['packages']
         return [
-            {'name': package_index[i]['name'], 'version':
-                package_index[i]['version']} for i in package_index]
+            {'name': package_index[i]['name'], 'identifier': i, 'version':
+                package_index[i]['version'], } for i in package_index]
     else:
         return []
